@@ -31,9 +31,10 @@ jobs:
           mkdir -p "$HOME/vault/mora"
           printf 'keep this vault file\n' > "$HOME/vault/mora/brew-canary.md"
 
+          expected_version="$(brew info --json=v2 --cask pyranthus-hq/tap/mora | jq -er '.casks[0].version')"
           brew install --cask pyranthus-hq/tap/mora
-          test "$(mora version --json | jq -r '.version')" = "0.15.1"
-          test "$(mora version | sed -n '1p')" = "mora 0.15.1"
+          test "$(mora version --json | jq -er '.version')" = "$expected_version"
+          test "$(mora version | sed -n '1p')" = "mora $expected_version"
           codesign --verify --deep --strict --verbose=2 -R=notarized /Applications/Mora.app
           xcrun stapler validate /Applications/Mora.app
           spctl --assess --type execute --verbose=2 /Applications/Mora.app
