@@ -1,16 +1,14 @@
 # Mora Homebrew tap
 
-This tap is currently private. The signed-app Cask on this branch replaces the obsolete v0.4 raw CLI package. It installs the signed Mora memory CLI app and links `mora`; it does not install the desktop companion.
+Public Homebrew distribution for Mora. The signed-app Cask replaces the obsolete v0.4 raw CLI package. It installs the signed Mora memory CLI app and links `mora`; it does not install the desktop companion.
 
-After this change is merged, users with access to this repository can install:
+Install on macOS:
 
 ```sh
 brew tap pyranthus-hq/tap
 brew install --cask pyranthus-hq/tap/mora
 mora version
 ```
-
-Public installation requires a separate decision to publish the tap. Do not expose private repository history just to enable installation.
 
 ## Existing installations
 
