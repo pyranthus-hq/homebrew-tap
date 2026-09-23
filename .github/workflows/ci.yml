@@ -1,0 +1,48 @@
+name: Cask canary
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  macos-cask:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # Tap the checked-out PR, so both style and install exercise this change.
+      - name: Tap this checkout
+        run: |
+          brew tap pyranthus-hq/tap "$GITHUB_WORKSPACE"
+          test "$(git -C "$(brew --repository pyranthus-hq/tap)" rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Check Cask style
+        run: |
+          # Third-party taps cannot use the literal preflight_steps that the
+          # InstallSteps cop requests. The Cask uses preflight to reject a
+          # conflicting ~/Applications/Mora.app; keep every other cop enabled.
+          brew style --cask --except-cops Cask/InstallSteps pyranthus-hq/tap/mora
+
+      - name: Install and verify signed Mora app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/vault/mora"
+          printf 'keep this vault file\n' > "$HOME/vault/mora/brew-canary.md"
+
+          brew install --cask pyranthus-hq/tap/mora
+          test "$(mora version --json | jq -r '.version')" = "0.15.1"
+          test "$(mora version | sed -n '1p')" = "mora 0.15.1"
+          codesign --verify --deep --strict --verbose=2 -R=notarized /Applications/Mora.app
+          xcrun stapler validate /Applications/Mora.app
+          spctl --assess --type execute --verbose=2 /Applications/Mora.app
+
+      - name: Uninstall without deleting user data
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew uninstall --cask pyranthus-hq/tap/mora
+          test ! -e /Applications/Mora.app
+          if command -v mora; then exit 1; fi
+          test "$(cat "$HOME/vault/mora/brew-canary.md")" = "keep this vault file"
