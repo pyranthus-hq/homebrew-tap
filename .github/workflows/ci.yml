@@ -31,8 +31,10 @@ jobs:
           mkdir -p "$HOME/vault/mora"
           printf 'keep this vault file\n' > "$HOME/vault/mora/brew-canary.md"
 
-          expected_version="$(brew info --json=v2 --cask pyranthus-hq/tap/mora | jq -er '.casks[0].version')"
+          # Since Homebrew 6, a fully qualified install trusts this Cask. brew info
+          # refuses an untrusted tap, so it has to run after the install.
           brew install --cask pyranthus-hq/tap/mora
+          expected_version="$(brew info --json=v2 --cask pyranthus-hq/tap/mora | jq -er '.casks[0].version')"
           test "$(mora version --json | jq -er '.version')" = "$expected_version"
           test "$(mora version | sed -n '1p')" = "mora $expected_version"
           codesign --verify --deep --strict --verbose=2 -R=notarized /Applications/Mora.app
