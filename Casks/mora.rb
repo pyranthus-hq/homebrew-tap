@@ -4,9 +4,9 @@
 cask "mora" do
   arch arm: "arm64", intel: "amd64"
 
-  version "0.15.4"
-  sha256 arm:   "c6d971801254ee3082cdfc8a180f91402467e5e6ebf523844a1822448c3555a4",
-         intel: "7f3799fe3d53e7f8a08bc29319e76b9b5fafab7a0f472e567d080e4795063c2b"
+  version "0.17.0"
+  sha256 arm:   "a1b73361d7da06ee5037c5e8abd6bdffdaf3564d798cc8b9ebc959a31bf5f846",
+         intel: "3f1a1edd8b0d7881f62d4a674272a52cbe8845bd60e444558e7cfff68c7d43a7"
 
   url "https://github.com/pyranthus-hq/mora/releases/download/v#{version}/mora_#{version}_darwin_#{arch}_app.zip"
   name "Mora"
